@@ -20,11 +20,12 @@ use BrokeYourBike\HttpClient\HttpClientTrait;
 use BrokeYourBike\HttpClient\HttpClientInterface;
 use BrokeYourBike\HasSourceModel\SourceModelInterface;
 use BrokeYourBike\HasSourceModel\HasSourceModelTrait;
+use BrokeYourBike\HasSourceModel\HasSourceModelInterface;
 
 /**
  * @author Ivan Stasiuk <brokeyourbike@gmail.com>
  */
-class Client implements HttpClientInterface
+class Client implements HttpClientInterface, HasSourceModelInterface
 {
     use HttpClientTrait;
     use ResolveUriTrait;

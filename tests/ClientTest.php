@@ -15,6 +15,7 @@ use BrokeYourBike\ResolveUri\ResolveUriTrait;
 use BrokeYourBike\HttpClient\HttpClientTrait;
 use BrokeYourBike\HttpClient\HttpClientInterface;
 use BrokeYourBike\HasSourceModel\HasSourceModelTrait;
+use BrokeYourBike\HasSourceModel\HasSourceModelInterface;
 
 /**
  * @author Ivan Stasiuk <brokeyourbike@gmail.com>
@@ -22,7 +23,7 @@ use BrokeYourBike\HasSourceModel\HasSourceModelTrait;
 class ClientTest extends TestCase
 {
     /** @test */
-    public function it_implemets_http_client_interface(): void
+    public function it_implements_http_client_interface(): void
     {
         /** @var ConfigInterface */
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
@@ -36,6 +37,23 @@ class ClientTest extends TestCase
         $api = new Client($mockedConfig, $mockedHttpClient, $mockedCache);
 
         $this->assertInstanceOf(HttpClientInterface::class, $api);
+    }
+
+    /** @test */
+    public function it_implements_has_source_model_interface(): void
+    {
+        /** @var ConfigInterface */
+        $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
+
+        /** @var \GuzzleHttp\ClientInterface */
+        $mockedHttpClient = $this->getMockBuilder(\GuzzleHttp\ClientInterface::class)->getMock();
+
+        /** @var \Psr\SimpleCache\CacheInterface */
+        $mockedCache = $this->getMockBuilder(\Psr\SimpleCache\CacheInterface::class)->getMock();
+
+        $api = new Client($mockedConfig, $mockedHttpClient, $mockedCache);
+
+        $this->assertInstanceOf(HasSourceModelInterface::class, $api);
     }
 
     /** @test */
