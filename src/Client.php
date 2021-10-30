@@ -62,13 +62,12 @@ class Client implements HttpClientInterface
             isset($responseJson['tokenDetail']['expiration']) &&
             is_string($responseJson['tokenDetail']['expiration'])
         ) {
-            $currentTime = Carbon::now();
             $expiresAt = Carbon::parse($responseJson['tokenDetail']['expiration']);
 
             $this->cache->set(
                 $this->authTokenCacheKey(),
                 $responseJson['tokenDetail']['token'],
-                $expiresAt->subSeconds($this->ttlMarginInSeconds)->diffInSeconds($currentTime)
+                $expiresAt->subSeconds($this->ttlMarginInSeconds)->diffInSeconds(Carbon::now())
             );
 
             return $responseJson['tokenDetail']['token'];
