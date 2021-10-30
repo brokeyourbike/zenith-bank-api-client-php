@@ -17,6 +17,7 @@ namespace BrokeYourBike\ZenithBank\Enums;
  * @method static ErrorCodeEnum UNAUTHENTICATED()
  * @method static ErrorCodeEnum ERROR()
  * @method static ErrorCodeEnum INVALID_ACCOUNT()
+ * @method static ErrorCodeEnum SYSTEM_EXCEPTION()
  * @psalm-immutable
  */
 final class ErrorCodeEnum extends \MyCLabs\Enum\Enum
