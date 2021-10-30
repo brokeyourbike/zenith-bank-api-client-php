@@ -68,7 +68,7 @@ class Client implements HttpClientInterface
             $this->cache->set(
                 $this->authTokenCacheKey(),
                 $responseJson['tokenDetail']['token'],
-                $expiresAt->subMinute()->diffInSeconds($currentTime) - $this->ttlMarginInSeconds
+                $expiresAt->subSeconds($this->ttlMarginInSeconds)->diffInSeconds($currentTime)
             );
 
             return $responseJson['tokenDetail']['token'];
