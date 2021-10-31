@@ -98,4 +98,91 @@ class Client implements HttpClientInterface, HasSourceModelInterface
             $options
         );
     }
+
+    public function fetchBalanceRaw(string $accountNumber): ResponseInterface
+    {
+        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/balance', [
+            'accountNumber' => $accountNumber,
+        ]);
+    }
+
+    public function fetchAccountRaw(string $bankCode, string $accountNumber): ResponseInterface
+    {
+        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/accountEnquiry', [
+            'destinationBankCode' => $bankCode,
+            'accountNumber' => $accountNumber,
+        ]);
+    }
+
+    public function fetchDomesticAccountRaw(string $accountNumber): ResponseInterface
+    {
+        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/domAccountEnquiry', [
+            'accountNumber' => $accountNumber,
+        ]);
+    }
+
+    public function fetchDomesticTransactionRaw(string $reference): ResponseInterface
+    {
+        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/domTransaction', [
+            'transactionReference' => $reference,
+        ]);
+    }
+
+    public function sendDomesticTransaction(TransactionInterface $transaction): ResponseInterface
+    {
+        if ($transaction instanceof SourceModelInterface) {
+            $this->setSourceModel($transaction);
+        }
+
+        return $this->performRequest(HttpMethodEnum::POST(), 'api/transaction/zenithDomTransfer', [
+            'transactionReference' => $transaction->getReference(),
+            'paymentReference' => $transaction->getReference(),
+            'senderName' => $transaction->getSenderName(),
+            'beneficiaryName' => $transaction->getRecipientName(),
+            'crAccount' => $transaction->getRecipientAccount(),
+            'drAccount' => $transaction->getDebitAccount(),
+            'amount' => $transaction->getAmount(),
+            'resend' => $transaction->shouldResend(),
+        ]);
+    }
+
+    public function fetchTransactionRaw(string $reference): ResponseInterface
+    {
+        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/transaction', [
+            'transactionReference' => $reference,
+        ]);
+    }
+
+    public function transactionLookupRaw(string $accountNumber, \DateTime $transactionDate): ResponseInterface
+    {
+        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/transactionLookup', [
+            'accountNumber' => $accountNumber,
+            'transactionDate' => $transactionDate->format('Y-m-d'),
+        ]);
+    }
+
+    /**
+     * @param HttpMethodEnum $method
+     * @param string $uri
+     * @param array<mixed> $data
+     * @return ResponseInterface
+     */
+    private function performRequest(HttpMethodEnum $method, string $uri, array $data): ResponseInterface
+    {
+        $options = [
+            \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+            \GuzzleHttp\RequestOptions::HEADERS => [
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . (string) $this->getAuthToken(),
+            ],
+            \GuzzleHttp\RequestOptions::JSON => $data,
+        ];
+
+        if ($this->getSourceModel()) {
+            $options[\BrokeYourBike\HasSourceModel\Enums\RequestOptions::SOURCE_MODEL] = $this->getSourceModel();
+        }
+
+        $uri = (string) $this->resolveUriFor($this->config->getUrl(), $uri);
+        return $this->httpClient->request((string) $method, $uri, $options);
+    }
 }

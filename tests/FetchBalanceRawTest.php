@@ -16,10 +16,10 @@ use BrokeYourBike\ZenithBank\Client;
 /**
  * @author Ivan Stasiuk <brokeyourbike@gmail.com>
  */
-class FetchAuthTokenRawTest extends TestCase
+class FetchBalanceRawTest extends TestCase
 {
-    private string $username = 'unique-username';
-    private string $password = 'secure-password';
+    private string $authToken = 'secure-token';
+    private string $accountNumber = '654987';
 
     /**
      * @test
@@ -30,27 +30,27 @@ class FetchAuthTokenRawTest extends TestCase
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $mockedConfig->method('isLive')->willReturn($isLive);
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
-        $mockedConfig->method('getUsername')->willReturn($this->username);
-        $mockedConfig->method('getPassword')->willReturn($this->password);
 
         /** @var \Mockery\MockInterface $mockedClient */
         $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
         $mockedClient->shouldReceive('request')->withArgs([
             'POST',
-            'https://api.example/api/authentication/getToken',
+            'https://api.example/api/enquiry/balance',
             [
                 \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
                 \GuzzleHttp\RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
+                    'Authorization' => "Bearer {$this->authToken}",
                 ],
-                \GuzzleHttp\RequestOptions::FORM_PARAMS => [
-                    'userIdentifyer' => $this->username,
-                    'userProtector' => $this->password,
+                \GuzzleHttp\RequestOptions::JSON => [
+                    'accountNumber' => $this->accountNumber,
                 ],
             ],
         ])->once();
 
         $mockedCache = $this->getMockBuilder(CacheInterface::class)->getMock();
+        $mockedCache->method('has')->willReturn(true);
+        $mockedCache->method('get')->willReturn($this->authToken);
 
         /**
          * @var ConfigInterface $mockedConfig
@@ -58,7 +58,8 @@ class FetchAuthTokenRawTest extends TestCase
          * @var CacheInterface $mockedCache
          * */
         $api = new Client($mockedConfig, $mockedClient, $mockedCache);
-        $requestResult = $api->fetchAuthTokenRaw();
+
+        $requestResult = $api->fetchBalanceRaw($this->accountNumber);
 
         $this->assertInstanceOf(ResponseInterface::class, $requestResult);
     }
