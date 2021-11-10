@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.1.1](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.1.0...v0.1.1) (2021-11-10)
+
+
+### Bug Fixes
+
+* send auth data as JSON ([1222eb4](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/1222eb4e8cdd7b7e8f18bc9c7e4e1efcb4c748ac))
+
 ## [0.1.0](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.0.1...v0.1.0) (2021-10-31)
 
 
