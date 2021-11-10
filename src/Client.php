@@ -84,7 +84,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
             \GuzzleHttp\RequestOptions::HEADERS => [
                 'Accept' => 'application/json',
             ],
-            \GuzzleHttp\RequestOptions::FORM_PARAMS => [
+            \GuzzleHttp\RequestOptions::JSON => [
                 'userIdentifyer' => $this->config->getUsername(),
                 'userProtector' => $this->config->getPassword(),
             ],

@@ -43,7 +43,7 @@ class FetchAuthTokenRawTest extends TestCase
                 \GuzzleHttp\RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
                 ],
-                \GuzzleHttp\RequestOptions::FORM_PARAMS => [
+                \GuzzleHttp\RequestOptions::JSON => [
                     'userIdentifyer' => $this->username,
                     'userProtector' => $this->password,
                 ],
