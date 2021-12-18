@@ -42,5 +42,5 @@
         "phpunit/phpunit": "^9",
         "mockery/mockery": "^1.4"
     },
-    "version": "0.1.1"
+    "version": "1.0.0"
 }
