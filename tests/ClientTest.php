@@ -57,30 +57,6 @@ class ClientTest extends TestCase
     }
 
     /** @test */
-    public function it_will_return_different_cache_key_for_test_and_sandbox()
-    {
-        /** @var \GuzzleHttp\ClientInterface */
-        $mockedHttpClient = $this->getMockBuilder(\GuzzleHttp\ClientInterface::class)->getMock();
-
-        /** @var \Psr\SimpleCache\CacheInterface */
-        $mockedCache = $this->getMockBuilder(\Psr\SimpleCache\CacheInterface::class)->getMock();
-
-        $liveConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $liveConfig->method('isLive')->willReturn(true);
-
-        /** @var ConfigInterface $liveConfig */
-        $liveApi = new Client($liveConfig, $mockedHttpClient, $mockedCache);
-
-        $sandboxConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $sandboxConfig->method('isLive')->willReturn(false);
-
-        /** @var ConfigInterface $sandboxConfig */
-        $sandboxApi = new Client($sandboxConfig, $mockedHttpClient, $mockedCache);
-
-        $this->assertNotEquals($liveApi->authTokenCacheKey(), $sandboxApi->authTokenCacheKey());
-    }
-
-    /** @test */
     public function it_uses_http_client_trait(): void
     {
         $usedTraits = class_uses(Client::class);

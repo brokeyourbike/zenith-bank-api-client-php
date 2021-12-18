@@ -18,12 +18,4 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         parent::tearDown();
         \Mockery::close();
     }
-
-    public function isLiveProvider(): array
-    {
-        return [
-            [true],
-            [false],
-        ];
-    }
 }

@@ -21,11 +21,8 @@ class SendDomesticTransactionTest extends TestCase
 {
     private string $authToken = 'secure-token';
 
-    /**
-     * @test
-     * @dataProvider isLiveProvider
-     */
-    public function it_can_prepare_request(bool $isLive): void
+    /** @test */
+    public function it_can_prepare_request(): void
     {
         $transaction = $this->getMockBuilder(TransactionInterface::class)->getMock();
         $transaction->method('getReference')->willReturn('REF-1234');
@@ -40,7 +37,6 @@ class SendDomesticTransactionTest extends TestCase
         $this->assertInstanceOf(TransactionInterface::class, $transaction);
 
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $mockedConfig->method('isLive')->willReturn($isLive);
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
         /** @var \Mockery\MockInterface $mockedClient */
@@ -83,17 +79,13 @@ class SendDomesticTransactionTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $requestResult);
     }
 
-    /**
-     * @test
-     * @dataProvider isLiveProvider
-     */
-    public function it_will_pass_source_model_as_option(bool $isLive): void
+    /** @test */
+    public function it_will_pass_source_model_as_option(): void
     {
         /** @var SourceTransactionFixture $transaction */
         $transaction = $this->getMockBuilder(SourceTransactionFixture::class)->getMock();
 
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $mockedConfig->method('isLive')->willReturn($isLive);
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
         /** @var \Mockery\MockInterface $mockedClient */

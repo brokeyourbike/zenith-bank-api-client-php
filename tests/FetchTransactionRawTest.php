@@ -21,14 +21,10 @@ class FetchTransactionRawTest extends TestCase
     private string $authToken = 'secure-token';
     private string $transactionReference = 'TRX-1234';
 
-    /**
-     * @test
-     * @dataProvider isLiveProvider
-     */
-    public function it_can_prepare_request(bool $isLive): void
+    /** @test */
+    public function it_can_prepare_request(): void
     {
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $mockedConfig->method('isLive')->willReturn($isLive);
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
         /** @var \Mockery\MockInterface $mockedClient */

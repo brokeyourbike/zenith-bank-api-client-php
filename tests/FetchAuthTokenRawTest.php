@@ -21,14 +21,10 @@ class FetchAuthTokenRawTest extends TestCase
     private string $username = 'unique-username';
     private string $password = 'secure-password';
 
-    /**
-     * @test
-     * @dataProvider isLiveProvider
-     */
-    public function it_can_prepare_request(bool $isLive): void
+    /** @test */
+    public function it_can_prepare_request(): void
     {
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $mockedConfig->method('isLive')->willReturn($isLive);
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
         $mockedConfig->method('getUsername')->willReturn($this->username);
         $mockedConfig->method('getPassword')->willReturn($this->password);
