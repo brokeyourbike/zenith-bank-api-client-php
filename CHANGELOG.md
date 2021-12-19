@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.1.1...v0.2.0) (2021-12-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove `isLive`
+
+### Bug Fixes
+
+* remove `isLive` ([855ae2c](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/855ae2cefa1de610dd29d176826f9513106a6ca1))
+
 ### [0.1.1](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.1.0...v0.1.1) (2021-11-10)
 
 
