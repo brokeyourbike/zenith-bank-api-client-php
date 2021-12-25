@@ -1,6 +1,6 @@
 <?php
 
-// Copyright (C) 2021 Ivan Stasiuk <brokeyourbike@gmail.com>.
+// Copyright (C) 2021 Ivan Stasiuk <ivan@stasi.uk>.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -23,7 +23,7 @@ use BrokeYourBike\HasSourceModel\HasSourceModelTrait;
 use BrokeYourBike\HasSourceModel\HasSourceModelInterface;
 
 /**
- * @author Ivan Stasiuk <brokeyourbike@gmail.com>
+ * @author Ivan Stasiuk <ivan@stasi.uk>
  */
 class Client implements HttpClientInterface, HasSourceModelInterface
 {
@@ -99,7 +99,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         $uri = (string) $this->resolveUriFor($this->config->getUrl(), 'api/authentication/getToken');
 
         return $this->httpClient->request(
-            (string) HttpMethodEnum::POST(),
+            HttpMethodEnum::POST->value,
             $uri,
             $options
         );
@@ -107,14 +107,14 @@ class Client implements HttpClientInterface, HasSourceModelInterface
 
     public function fetchBalanceRaw(string $accountNumber): ResponseInterface
     {
-        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/balance', [
+        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/balance', [
             'accountNumber' => $accountNumber,
         ]);
     }
 
     public function fetchAccountRaw(string $bankCode, string $accountNumber): ResponseInterface
     {
-        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/accountEnquiry', [
+        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/accountEnquiry', [
             'destinationBankCode' => $bankCode,
             'accountNumber' => $accountNumber,
         ]);
@@ -122,14 +122,14 @@ class Client implements HttpClientInterface, HasSourceModelInterface
 
     public function fetchDomesticAccountRaw(string $accountNumber): ResponseInterface
     {
-        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/domAccountEnquiry', [
+        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domAccountEnquiry', [
             'accountNumber' => $accountNumber,
         ]);
     }
 
     public function fetchDomesticTransactionRaw(string $reference): ResponseInterface
     {
-        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/domTransaction', [
+        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domTransaction', [
             'transactionReference' => $reference,
         ]);
     }
@@ -140,7 +140,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
             $this->setSourceModel($transaction);
         }
 
-        return $this->performRequest(HttpMethodEnum::POST(), 'api/transaction/zenithDomTransfer', [
+        return $this->performRequest(HttpMethodEnum::POST, 'api/transaction/zenithDomTransfer', [
             'transactionReference' => $transaction->getReference(),
             'paymentReference' => $transaction->getReference(),
             'senderName' => $transaction->getSenderName(),
@@ -154,14 +154,14 @@ class Client implements HttpClientInterface, HasSourceModelInterface
 
     public function fetchTransactionRaw(string $reference): ResponseInterface
     {
-        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/transaction', [
+        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transaction', [
             'transactionReference' => $reference,
         ]);
     }
 
     public function transactionLookupRaw(string $accountNumber, \DateTime $transactionDate): ResponseInterface
     {
-        return $this->performRequest(HttpMethodEnum::POST(), 'api/enquiry/transactionLookup', [
+        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transactionLookup', [
             'accountNumber' => $accountNumber,
             'transactionDate' => $transactionDate->format('Y-m-d'),
         ]);
@@ -189,6 +189,6 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         }
 
         $uri = (string) $this->resolveUriFor($this->config->getUrl(), $uri);
-        return $this->httpClient->request((string) $method, $uri, $options);
+        return $this->httpClient->request($method->value, $uri, $options);
     }
 }

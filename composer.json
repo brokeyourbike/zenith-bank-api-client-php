@@ -22,17 +22,16 @@
     "authors": [
         {
             "name": "Ivan Stasiuk",
-            "email": "brokeyourbike@gmail.com",
-            "homepage": "https://github.com/brokeyourbike"
+            "email": "ivan@stasi.uk",
+            "homepage": "https://stasi.uk"
         }
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "brokeyourbike/http-client": "^1.0",
         "brokeyourbike/resolve-uri": "^1.0",
-        "myclabs/php-enum": "^1.8",
-        "brokeyourbike/http-enums": "^1.0",
+        "brokeyourbike/http-enums": "^2.0",
         "brokeyourbike/has-source-model": "^2.0",
         "psr/simple-cache": "^1.0",
         "nesbot/carbon": "^2"

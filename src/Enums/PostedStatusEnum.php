@@ -3,14 +3,10 @@
 namespace BrokeYourBike\ZenithBank\Enums;
 
 /**
- * @author Ivan Stasiuk <brokeyourbike@gmail.com>
- *
- * @method static PostedStatusEnum YES()
- * @method static PostedStatusEnum NO()
- * @psalm-immutable
+ * @author Ivan Stasiuk <ivan@stasi.uk>
  */
-final class PostedStatusEnum extends \MyCLabs\Enum\Enum
+enum PostedStatusEnum: string
 {
-    private const YES = 'Y';
-    private const NO = 'N';
+    case YES = 'Y';
+    case NO = 'N';
 }

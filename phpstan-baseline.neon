@@ -1,52 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\ErrorCodeEnum\\:\\:DUPLICATE_TRANSACTION is unused\\.$#"
+			message: "#^Access to an undefined property BrokeYourBike\\\\HttpEnums\\\\HttpMethodEnum\\:\\:\\$value\\.$#"
 			count: 1
-			path: src/Enums/ErrorCodeEnum.php
+			path: src/Client.php
 
 		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\ErrorCodeEnum\\:\\:ERROR is unused\\.$#"
-			count: 1
-			path: src/Enums/ErrorCodeEnum.php
-
-		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\ErrorCodeEnum\\:\\:INVALID_ACCOUNT is unused\\.$#"
-			count: 1
-			path: src/Enums/ErrorCodeEnum.php
-
-		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\ErrorCodeEnum\\:\\:SUCCESS is unused\\.$#"
-			count: 1
-			path: src/Enums/ErrorCodeEnum.php
-
-		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\ErrorCodeEnum\\:\\:SYSTEM_EXCEPTION is unused\\.$#"
-			count: 1
-			path: src/Enums/ErrorCodeEnum.php
-
-		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\ErrorCodeEnum\\:\\:UNAUTHENTICATED is unused\\.$#"
-			count: 1
-			path: src/Enums/ErrorCodeEnum.php
-
-		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\ErrorCodeEnum\\:\\:WRONG_REQUEST is unused\\.$#"
-			count: 1
-			path: src/Enums/ErrorCodeEnum.php
-
-		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\PostedStatusEnum\\:\\:NO is unused\\.$#"
-			count: 1
-			path: src/Enums/PostedStatusEnum.php
-
-		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\PostedStatusEnum\\:\\:YES is unused\\.$#"
-			count: 1
-			path: src/Enums/PostedStatusEnum.php
-
-		-
-			message: "#^Constant BrokeYourBike\\\\ZenithBank\\\\Enums\\\\StatusCodeEnum\\:\\:PROCESSED is unused\\.$#"
-			count: 1
-			path: src/Enums/StatusCodeEnum.php
+			message: "#^Access to undefined constant BrokeYourBike\\\\HttpEnums\\\\HttpMethodEnum\\:\\:POST\\.$#"
+			count: 8
+			path: src/Client.php
 
