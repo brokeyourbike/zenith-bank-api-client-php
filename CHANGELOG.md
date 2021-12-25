@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.2.1](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.2.0...v0.2.1) (2021-12-25)
+
+
+### Bug Fixes
+
+* use native enums ([f1ae952](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/f1ae9528090b0405ea465044991c1c8cdd6fd104))
+
 ## [0.2.0](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.1.1...v0.2.0) (2021-12-19)
 
 
