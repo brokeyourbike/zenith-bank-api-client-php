@@ -42,6 +42,11 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         $this->cache = $cache;
     }
 
+    public function getConfig(): ConfigInterface
+    {
+        return $this->config;
+    }
+
     public function authTokenCacheKey(): string
     {
         return get_class($this) . ':authToken:';
