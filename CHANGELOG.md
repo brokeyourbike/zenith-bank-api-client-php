@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.2.2](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.2.1...v0.2.2) (2022-01-02)
+
+
+### Bug Fixes
+
+* add `getConfig` interface ([3a95a60](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/3a95a606af6d564cf1173dff1399a8b8ffb08790))
+* remove baseline ([cafbe22](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/cafbe223cf2650dcd13e6c351fea6b156b650b37))
+
 ### [0.2.1](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.2.0...v0.2.1) (2021-12-25)
 
 
