@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.3.1](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.3.0...v0.3.1) (2022-01-03)
+
+
+### Bug Fixes
+
+* update `brokeyourbike/data-transfer-object` ([5e4a843](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/5e4a84371cba5fc20ac68cec4a9b9a71498e2b20))
+
 ## [0.3.0](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.2.2...v0.3.0) (2022-01-03)
 
 
