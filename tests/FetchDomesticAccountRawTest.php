@@ -10,6 +10,7 @@ namespace BrokeYourBike\ZenithBank\Tests;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
+use BrokeYourBike\ZenithBank\Models\FetchDomesticAccountResponse;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
 
@@ -27,13 +28,26 @@ class FetchDomesticAccountRawTest extends TestCase
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
+        $mockedResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $mockedResponse->method('getStatusCode')->willReturn(200);
+        $mockedResponse->method('getBody')
+            ->willReturn('{
+                "responseCode": "00",
+                "responseDescription": "SUCCESS",
+                "description": null,
+                "accountName": "JANE   DOE",
+                "accountType": "SA ",
+                "branchNo": 127,
+                "crncyID": 1
+            }');
+
         /** @var \Mockery\MockInterface $mockedClient */
         $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
         $mockedClient->shouldReceive('request')->withArgs([
             'POST',
             'https://api.example/api/enquiry/domAccountEnquiry',
             [
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+
                 \GuzzleHttp\RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
                     'Authorization' => "Bearer {$this->authToken}",
@@ -42,7 +56,7 @@ class FetchDomesticAccountRawTest extends TestCase
                     'accountNumber' => $this->accountNumber,
                 ],
             ],
-        ])->once();
+        ])->once()->andReturn($mockedResponse);
 
         $mockedCache = $this->getMockBuilder(CacheInterface::class)->getMock();
         $mockedCache->method('has')->willReturn(true);
@@ -57,6 +71,6 @@ class FetchDomesticAccountRawTest extends TestCase
 
         $requestResult = $api->fetchDomesticAccountRaw($this->accountNumber);
 
-        $this->assertInstanceOf(ResponseInterface::class, $requestResult);
+        $this->assertInstanceOf(FetchDomesticAccountResponse::class, $requestResult);
     }
 }

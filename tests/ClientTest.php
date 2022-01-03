@@ -8,7 +8,6 @@
 
 namespace BrokeYourBike\ZenithBank\Tests;
 
-use PHPUnit\Framework\TestCase;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
 use BrokeYourBike\ResolveUri\ResolveUriTrait;
@@ -38,6 +37,7 @@ class ClientTest extends TestCase
 
         $this->assertInstanceOf(HttpClientInterface::class, $api);
         $this->assertSame($mockedConfig, $api->getConfig());
+        $this->assertSame($mockedCache, $api->getCache());
     }
 
     /** @test */

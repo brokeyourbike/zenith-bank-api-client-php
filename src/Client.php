@@ -12,6 +12,14 @@ use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\ClientInterface;
 use Carbon\Carbon;
+use BrokeYourBike\ZenithBank\Models\TransactionLookupResponse;
+use BrokeYourBike\ZenithBank\Models\SendDomesticTransactionResponse;
+use BrokeYourBike\ZenithBank\Models\FetchTransactionResponse;
+use BrokeYourBike\ZenithBank\Models\FetchDomesticTransactionResponse;
+use BrokeYourBike\ZenithBank\Models\FetchDomesticAccountResponse;
+use BrokeYourBike\ZenithBank\Models\FetchBalanceResponse;
+use BrokeYourBike\ZenithBank\Models\FetchAuthTokenResponse;
+use BrokeYourBike\ZenithBank\Models\FetchAccountResponse;
 use BrokeYourBike\ZenithBank\Interfaces\TransactionInterface;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ResolveUri\ResolveUriTrait;
@@ -47,12 +55,17 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         return $this->config;
     }
 
+    public function getCache(): CacheInterface
+    {
+        return $this->cache;
+    }
+
     public function authTokenCacheKey(): string
     {
         return get_class($this) . ':authToken:';
     }
 
-    public function getAuthToken(): ?string
+    public function getAuthToken(): string
     {
         if ($this->cache->has($this->authTokenCacheKey())) {
             $cachedToken = $this->cache->get($this->authTokenCacheKey());
@@ -63,35 +76,21 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         }
 
         $response = $this->fetchAuthTokenRaw();
-        $responseJson = \json_decode((string) $response->getBody(), true);
 
-        if (
-            is_array($responseJson) &&
-            isset($responseJson['tokenDetail']) &&
-            is_array($responseJson['tokenDetail']) &&
-            isset($responseJson['tokenDetail']['token']) &&
-            is_string($responseJson['tokenDetail']['token']) &&
-            isset($responseJson['tokenDetail']['expiration']) &&
-            is_string($responseJson['tokenDetail']['expiration'])
-        ) {
-            $expiresAt = Carbon::parse($responseJson['tokenDetail']['expiration']);
+        $expiresAt = Carbon::parse($response->expiration);
 
-            $this->cache->set(
-                $this->authTokenCacheKey(),
-                $responseJson['tokenDetail']['token'],
-                $expiresAt->subSeconds($this->ttlMarginInSeconds)->diffInSeconds(Carbon::now())
-            );
+        $this->cache->set(
+            $this->authTokenCacheKey(),
+            $response->token,
+            $expiresAt->subSeconds($this->ttlMarginInSeconds)->diffInSeconds(Carbon::now())
+        );
 
-            return $responseJson['tokenDetail']['token'];
-        }
-
-        return null;
+        return $response->token;
     }
 
-    public function fetchAuthTokenRaw(): ResponseInterface
+    public function fetchAuthTokenRaw(): FetchAuthTokenResponse
     {
         $options = [
-            \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
             \GuzzleHttp\RequestOptions::HEADERS => [
                 'Accept' => 'application/json',
             ],
@@ -103,49 +102,59 @@ class Client implements HttpClientInterface, HasSourceModelInterface
 
         $uri = (string) $this->resolveUriFor($this->config->getUrl(), 'api/authentication/getToken');
 
-        return $this->httpClient->request(
+        $response = $this->httpClient->request(
             HttpMethodEnum::POST->value,
             $uri,
             $options
         );
+
+        return new FetchAuthTokenResponse($response);
     }
 
-    public function fetchBalanceRaw(string $accountNumber): ResponseInterface
+    public function fetchBalanceRaw(string $accountNumber): FetchBalanceResponse
     {
-        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/balance', [
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/balance', [
             'accountNumber' => $accountNumber,
         ]);
+
+        return new FetchBalanceResponse($response);
     }
 
-    public function fetchAccountRaw(string $bankCode, string $accountNumber): ResponseInterface
+    public function fetchAccountRaw(string $bankCode, string $accountNumber): FetchAccountResponse
     {
-        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/accountEnquiry', [
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/accountEnquiry', [
             'destinationBankCode' => $bankCode,
             'accountNumber' => $accountNumber,
         ]);
+
+        return new FetchAccountResponse($response);
     }
 
-    public function fetchDomesticAccountRaw(string $accountNumber): ResponseInterface
+    public function fetchDomesticAccountRaw(string $accountNumber): FetchDomesticAccountResponse
     {
-        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domAccountEnquiry', [
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domAccountEnquiry', [
             'accountNumber' => $accountNumber,
         ]);
+
+        return new FetchDomesticAccountResponse($response);
     }
 
-    public function fetchDomesticTransactionRaw(string $reference): ResponseInterface
+    public function fetchDomesticTransactionRaw(string $reference): FetchDomesticTransactionResponse
     {
-        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domTransaction', [
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domTransaction', [
             'transactionReference' => $reference,
         ]);
+
+        return new FetchDomesticTransactionResponse($response);
     }
 
-    public function sendDomesticTransaction(TransactionInterface $transaction): ResponseInterface
+    public function sendDomesticTransaction(TransactionInterface $transaction): SendDomesticTransactionResponse
     {
         if ($transaction instanceof SourceModelInterface) {
             $this->setSourceModel($transaction);
         }
 
-        return $this->performRequest(HttpMethodEnum::POST, 'api/transaction/zenithDomTransfer', [
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/transaction/zenithDomTransfer', [
             'transactionReference' => $transaction->getReference(),
             'paymentReference' => $transaction->getReference(),
             'senderName' => $transaction->getSenderName(),
@@ -155,21 +164,27 @@ class Client implements HttpClientInterface, HasSourceModelInterface
             'amount' => $transaction->getAmount(),
             'resend' => $transaction->shouldResend(),
         ]);
+
+        return new SendDomesticTransactionResponse($response);
     }
 
-    public function fetchTransactionRaw(string $reference): ResponseInterface
+    public function fetchTransactionRaw(string $reference): FetchTransactionResponse
     {
-        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transaction', [
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transaction', [
             'transactionReference' => $reference,
         ]);
+
+        return new FetchTransactionResponse($response);
     }
 
-    public function transactionLookupRaw(string $accountNumber, \DateTime $transactionDate): ResponseInterface
+    public function transactionLookupRaw(string $accountNumber, \DateTime $transactionDate): TransactionLookupResponse
     {
-        return $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transactionLookup', [
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transactionLookup', [
             'accountNumber' => $accountNumber,
             'transactionDate' => $transactionDate->format('Y-m-d'),
         ]);
+
+        return new TransactionLookupResponse($response);
     }
 
     /**
@@ -181,10 +196,9 @@ class Client implements HttpClientInterface, HasSourceModelInterface
     private function performRequest(HttpMethodEnum $method, string $uri, array $data): ResponseInterface
     {
         $options = [
-            \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
             \GuzzleHttp\RequestOptions::HEADERS => [
                 'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . (string) $this->getAuthToken(),
+                'Authorization' => "Bearer {$this->getAuthToken()}",
             ],
             \GuzzleHttp\RequestOptions::JSON => $data,
         ];

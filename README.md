@@ -20,6 +20,11 @@ composer require brokeyourbike/zenith-bank-api-client
 
 ```php
 use BrokeYourBike\ZenithBank\Client;
+use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
+
+assert($config instanceof ConfigInterface);
+assert($httpClient instanceof \GuzzleHttp\ClientInterface);
+assert($psrCache instanceof \Psr\SimpleCache\CacheInterface);
 
 $apiClient = new Client($config, $httpClient, $psrCache);
 $apiClient->fetchAuthTokenRaw();

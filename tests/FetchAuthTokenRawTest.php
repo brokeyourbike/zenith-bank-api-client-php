@@ -10,6 +10,7 @@ namespace BrokeYourBike\ZenithBank\Tests;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
+use BrokeYourBike\ZenithBank\Models\FetchAuthTokenResponse;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
 
@@ -29,13 +30,25 @@ class FetchAuthTokenRawTest extends TestCase
         $mockedConfig->method('getUsername')->willReturn($this->username);
         $mockedConfig->method('getPassword')->willReturn($this->password);
 
+        $mockedResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $mockedResponse->method('getStatusCode')->willReturn(200);
+        $mockedResponse->method('getBody')
+            ->willReturn('{
+                "responseCode": "00",
+                "responseDescription": "SUCCESS",
+                "description": null,
+                "tokenDetail": {
+                    "token": "super.secure.string",
+                    "expiration": "2022-01-04T11:09:18.000+0000"
+                }
+            }');
+
         /** @var \Mockery\MockInterface $mockedClient */
         $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
         $mockedClient->shouldReceive('request')->withArgs([
             'POST',
             'https://api.example/api/authentication/getToken',
             [
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
                 \GuzzleHttp\RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
                 ],
@@ -44,7 +57,7 @@ class FetchAuthTokenRawTest extends TestCase
                     'userProtector' => $this->password,
                 ],
             ],
-        ])->once();
+        ])->once()->andReturn($mockedResponse);
 
         $mockedCache = $this->getMockBuilder(CacheInterface::class)->getMock();
 
@@ -56,6 +69,6 @@ class FetchAuthTokenRawTest extends TestCase
         $api = new Client($mockedConfig, $mockedClient, $mockedCache);
         $requestResult = $api->fetchAuthTokenRaw();
 
-        $this->assertInstanceOf(ResponseInterface::class, $requestResult);
+        $this->assertInstanceOf(FetchAuthTokenResponse::class, $requestResult);
     }
 }

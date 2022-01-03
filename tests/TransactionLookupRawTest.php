@@ -11,6 +11,7 @@ namespace BrokeYourBike\ZenithBank\Tests;
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
 use Carbon\Carbon;
+use BrokeYourBike\ZenithBank\Models\TransactionLookupResponse;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
 
@@ -37,13 +38,22 @@ class TransactionLookupRawTest extends TestCase
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
+        $mockedResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $mockedResponse->method('getStatusCode')->willReturn(200);
+        $mockedResponse->method('getBody')
+            ->willReturn('{
+                "responseCode": "14",
+                "responseDescription": "SYSTEM EXCEPTION",
+                "description": "There was a system exception (please check transaction status)"
+            }');
+
         /** @var \Mockery\MockInterface $mockedClient */
         $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
         $mockedClient->shouldReceive('request')->withArgs([
             'POST',
             'https://api.example/api/enquiry/transactionLookup',
             [
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+
                 \GuzzleHttp\RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
                     'Authorization' => "Bearer {$this->authToken}",
@@ -53,7 +63,7 @@ class TransactionLookupRawTest extends TestCase
                     'transactionDate' => '2020-01-05',
                 ],
             ],
-        ])->once();
+        ])->once()->andReturn($mockedResponse);
 
         $mockedCache = $this->getMockBuilder(CacheInterface::class)->getMock();
         $mockedCache->method('has')->willReturn(true);
@@ -68,6 +78,6 @@ class TransactionLookupRawTest extends TestCase
 
         $requestResult = $api->transactionLookupRaw($this->accountNumber, $this->transactionDate);
 
-        $this->assertInstanceOf(ResponseInterface::class, $requestResult);
+        $this->assertInstanceOf(TransactionLookupResponse::class, $requestResult);
     }
 }

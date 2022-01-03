@@ -144,34 +144,4 @@ class GetAuthTokenTest extends TestCase
 
         $this->assertSame($this->tokenValue, $requestResult);
     }
-
-    /** @test */
-    public function it_will_return_null_if_response_invalid()
-    {
-        $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
-
-        $mockedResponse = $this->getMockBuilder(\Psr\Http\Message\ResponseInterface::class)->getMock();
-        $mockedResponse->method('getStatusCode')->willReturn(200);
-        $mockedResponse->method('getBody')->willReturn('{}');
-
-        /** @var \GuzzleHttp\Client $mockedClient */
-        $mockedClient = $this->createPartialMock(\GuzzleHttp\Client::class, ['request']);
-        $mockedClient->method('request')->willReturn($mockedResponse);
-
-        /** @var \Mockery\MockInterface $mockedCache */
-        $mockedCache = \Mockery::spy(CacheInterface::class);
-
-        /**
-         * @var ConfigInterface $mockedConfig
-         * @var \GuzzleHttp\Client $mockedClient
-         * @var CacheInterface $mockedCache
-         * */
-        $api = new Client($mockedConfig, $mockedClient, $mockedCache);
-        $requestResult = $api->getAuthToken();
-
-        $this->assertNull($requestResult);
-
-        /** @var \Mockery\MockInterface $mockedCache */
-        $mockedCache->shouldNotReceive('set');
-    }
 }

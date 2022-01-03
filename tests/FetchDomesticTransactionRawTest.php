@@ -10,6 +10,7 @@ namespace BrokeYourBike\ZenithBank\Tests;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
+use BrokeYourBike\ZenithBank\Models\FetchDomesticTransactionResponse;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
 
@@ -27,13 +28,33 @@ class FetchDomesticTransactionRawTest extends TestCase
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
+        $mockedResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $mockedResponse->method('getStatusCode')->willReturn(200);
+        $mockedResponse->method('getBody')
+            ->willReturn('{
+                "responseCode": "05",
+                "responseDescription": "TRANSACTION NOT FOUND",
+                "description": null,
+                "drAccount": null,
+                "crAccount": null,
+                "amount": null,
+                "senderName": null,
+                "beneficiaryName": null,
+                "transactionReference": null,
+                "paymentReference": null,
+                "createDate": null,
+                "transactionStatus": null,
+                "posted": null,
+                "postingReference": null
+            }');
+
         /** @var \Mockery\MockInterface $mockedClient */
         $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
         $mockedClient->shouldReceive('request')->withArgs([
             'POST',
             'https://api.example/api/enquiry/domTransaction',
             [
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+
                 \GuzzleHttp\RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
                     'Authorization' => "Bearer {$this->authToken}",
@@ -42,7 +63,7 @@ class FetchDomesticTransactionRawTest extends TestCase
                     'transactionReference' => $this->transactionReference,
                 ],
             ],
-        ])->once();
+        ])->once()->andReturn($mockedResponse);
 
         $mockedCache = $this->getMockBuilder(CacheInterface::class)->getMock();
         $mockedCache->method('has')->willReturn(true);
@@ -57,6 +78,6 @@ class FetchDomesticTransactionRawTest extends TestCase
 
         $requestResult = $api->fetchDomesticTransactionRaw($this->transactionReference);
 
-        $this->assertInstanceOf(ResponseInterface::class, $requestResult);
+        $this->assertInstanceOf(FetchDomesticTransactionResponse::class, $requestResult);
     }
 }

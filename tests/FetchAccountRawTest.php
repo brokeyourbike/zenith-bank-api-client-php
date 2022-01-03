@@ -10,6 +10,7 @@ namespace BrokeYourBike\ZenithBank\Tests;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
+use BrokeYourBike\ZenithBank\Models\FetchAccountResponse;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
 
@@ -28,13 +29,24 @@ class FetchAccountRawTest extends TestCase
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
+        $mockedResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $mockedResponse->method('getStatusCode')->willReturn(200);
+        $mockedResponse->method('getBody')
+            ->willReturn('{
+                "accountName": "EXAMPLE LTD",
+                "accountNumber": null,
+                "responseDescription": "This transaction is successful",
+                "name": "EXAMPLE LTD",
+                "nameInquirySession": null,
+                "responseCode": "00"
+            }');
+
         /** @var \Mockery\MockInterface $mockedClient */
         $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
         $mockedClient->shouldReceive('request')->withArgs([
             'POST',
             'https://api.example/api/enquiry/accountEnquiry',
             [
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
                 \GuzzleHttp\RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
                     'Authorization' => "Bearer {$this->authToken}",
@@ -44,7 +56,7 @@ class FetchAccountRawTest extends TestCase
                     'accountNumber' => $this->accountNumber,
                 ],
             ],
-        ])->once();
+        ])->once()->andReturn($mockedResponse);
 
         $mockedCache = $this->getMockBuilder(CacheInterface::class)->getMock();
         $mockedCache->method('has')->willReturn(true);
@@ -59,6 +71,6 @@ class FetchAccountRawTest extends TestCase
 
         $requestResult = $api->fetchAccountRaw($this->bankCode, $this->accountNumber);
 
-        $this->assertInstanceOf(ResponseInterface::class, $requestResult);
+        $this->assertInstanceOf(FetchAccountResponse::class, $requestResult);
     }
 }

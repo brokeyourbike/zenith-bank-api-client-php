@@ -10,6 +10,7 @@ namespace BrokeYourBike\ZenithBank\Tests;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
+use BrokeYourBike\ZenithBank\Models\SendDomesticTransactionResponse;
 use BrokeYourBike\ZenithBank\Interfaces\TransactionInterface;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
@@ -39,13 +40,27 @@ class SendDomesticTransactionTest extends TestCase
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
+        $mockedResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $mockedResponse->method('getStatusCode')->willReturn(200);
+        $mockedResponse->method('getBody')
+            ->willReturn('{
+                "responseCode": "11",
+                "responseDescription": "ERROR PROCESSING REQUEST",
+                "description": "-90000498|-90009|charges has not been setup for this customer",
+                "transactionReference": "REF-1234",
+                "posted": "N",
+                "transactionStatus": "PROCESSED",
+                "postingDate": null,
+                "postingReference": null
+            }');
+
         /** @var \Mockery\MockInterface $mockedClient */
         $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
         $mockedClient->shouldReceive('request')->withArgs([
             'POST',
             'https://api.example/api/transaction/zenithDomTransfer',
             [
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+
                 \GuzzleHttp\RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
                     'Authorization' => "Bearer {$this->authToken}",
@@ -61,7 +76,7 @@ class SendDomesticTransactionTest extends TestCase
                     'resend' => false,
                 ],
             ],
-        ])->once();
+        ])->once()->andReturn($mockedResponse);
 
         $mockedCache = $this->getMockBuilder(CacheInterface::class)->getMock();
         $mockedCache->method('has')->willReturn(true);
@@ -76,56 +91,6 @@ class SendDomesticTransactionTest extends TestCase
 
         $requestResult = $api->sendDomesticTransaction($transaction);
 
-        $this->assertInstanceOf(ResponseInterface::class, $requestResult);
-    }
-
-    /** @test */
-    public function it_will_pass_source_model_as_option(): void
-    {
-        /** @var SourceTransactionFixture $transaction */
-        $transaction = $this->getMockBuilder(SourceTransactionFixture::class)->getMock();
-
-        $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $mockedConfig->method('getUrl')->willReturn('https://api.example/');
-
-        /** @var \Mockery\MockInterface $mockedClient */
-        $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
-        $mockedClient->shouldReceive('request')->withArgs([
-            'POST',
-            'https://api.example/api/transaction/zenithDomTransfer',
-            [
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
-                \GuzzleHttp\RequestOptions::HEADERS => [
-                    'Accept' => 'application/json',
-                    'Authorization' => "Bearer {$this->authToken}",
-                ],
-                \GuzzleHttp\RequestOptions::JSON => [
-                    'transactionReference' => $transaction->getReference(),
-                    'paymentReference' => $transaction->getReference(),
-                    'senderName' => $transaction->getSenderName(),
-                    'beneficiaryName' => $transaction->getRecipientName(),
-                    'crAccount' => $transaction->getRecipientAccount(),
-                    'drAccount' => $transaction->getDebitAccount(),
-                    'amount' => $transaction->getAmount(),
-                    'resend' => $transaction->shouldResend(),
-                ],
-                \BrokeYourBike\HasSourceModel\Enums\RequestOptions::SOURCE_MODEL => $transaction,
-            ],
-        ])->once();
-
-        $mockedCache = $this->getMockBuilder(CacheInterface::class)->getMock();
-        $mockedCache->method('has')->willReturn(true);
-        $mockedCache->method('get')->willReturn($this->authToken);
-
-        /**
-         * @var ConfigInterface $mockedConfig
-         * @var \GuzzleHttp\Client $mockedClient
-         * @var CacheInterface $mockedCache
-         * */
-        $api = new Client($mockedConfig, $mockedClient, $mockedCache);
-
-        $requestResult = $api->sendDomesticTransaction($transaction);
-
-        $this->assertInstanceOf(ResponseInterface::class, $requestResult);
+        $this->assertInstanceOf(SendDomesticTransactionResponse::class, $requestResult);
     }
 }

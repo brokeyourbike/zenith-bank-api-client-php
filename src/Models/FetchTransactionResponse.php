@@ -6,13 +6,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
 // You can obtain one at https://mozilla.org/MPL/2.0/.
 
-namespace BrokeYourBike\ZenithBank\Tests;
+namespace BrokeYourBike\ZenithBank\Models;
 
-use BrokeYourBike\ZenithBank\Interfaces\TransactionInterface;
-use BrokeYourBike\HasSourceModel\SourceModelInterface;
+use BrokeYourBike\DataTransferObject\JsonResponse;
 
 /**
  * @author Ivan Stasiuk <ivan@stasi.uk>
  */
-abstract class SourceTransactionFixture implements TransactionInterface, SourceModelInterface
-{}
+class FetchTransactionResponse extends JsonResponse
+{
+    public string $responseCode;
+    public string $responseDescription;
+    public ?string $description;
+}
