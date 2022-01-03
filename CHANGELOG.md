@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.2.2...v0.3.0) (2022-01-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* add responses
+
+### Features
+
+* add responses ([69d20da](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/69d20daa63190daf9e1ea369ee30119197e0e5a0))
+
 ### [0.2.2](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.2.1...v0.2.2) (2022-01-02)
 
 
