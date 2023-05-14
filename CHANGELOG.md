@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.3.2](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.3.1...v0.3.2) (2023-05-14)
+
+
+### Miscellaneous Chores
+
+* badges ([83aadd7](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/83aadd71d6fc762bb172a4ad1206e0ed7a83fde0))
+
 ### [0.3.1](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.3.0...v0.3.1) (2022-01-03)
 
 
