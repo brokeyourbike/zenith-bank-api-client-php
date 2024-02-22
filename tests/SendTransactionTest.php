@@ -10,21 +10,30 @@ namespace BrokeYourBike\ZenithBank\Tests;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
-use BrokeYourBike\ZenithBank\Models\FetchDomesticTransactionResponse;
+use BrokeYourBike\ZenithBank\Models\SendTransactionResponse;
+use BrokeYourBike\ZenithBank\Interfaces\TransactionInterface;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
 
 /**
  * @author Ivan Stasiuk <ivan@stasi.uk>
  */
-class FetchDomesticTransactionTest extends TestCase
+class SendTransactionTest extends TestCase
 {
     private string $authToken = 'secure-token';
-    private string $transactionReference = 'TRX-1234';
 
     /** @test */
     public function it_can_prepare_request(): void
     {
+        $transaction = $this->getMockBuilder(TransactionInterface::class)->getMock();
+        $transaction->method('getReference')->willReturn('REF-1234');
+        $transaction->method('getRecipientAccount')->willReturn('556890');
+        $transaction->method('getDebitAccount')->willReturn('448000');
+        $transaction->method('getAmount')->willReturn(100.01);
+
+        /** @var TransactionInterface $transaction */
+        $this->assertInstanceOf(TransactionInterface::class, $transaction);
+
         $mockedConfig = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $mockedConfig->method('getUrl')->willReturn('https://api.example/');
 
@@ -32,19 +41,13 @@ class FetchDomesticTransactionTest extends TestCase
         $mockedResponse->method('getStatusCode')->willReturn(200);
         $mockedResponse->method('getBody')
             ->willReturn('{
-                "responseCode": "05",
-                "responseDescription": "TRANSACTION NOT FOUND",
-                "description": null,
-                "drAccount": null,
-                "crAccount": null,
-                "amount": null,
-                "senderName": null,
-                "beneficiaryName": null,
-                "transactionReference": null,
-                "paymentReference": null,
-                "createDate": null,
+                "responseCode": "01",
+                "responseDescription": "DUPLICATE TRANSACTION REFERENCE",
+                "description": "Suspected Duplicate with transaction Reference 405",
+                "transactionReference": "405",
+                "posted": "N",
                 "transactionStatus": null,
-                "posted": null,
+                "postingDate": null,
                 "postingReference": null
             }');
 
@@ -52,7 +55,7 @@ class FetchDomesticTransactionTest extends TestCase
         $mockedClient = \Mockery::mock(\GuzzleHttp\Client::class);
         $mockedClient->shouldReceive('request')->withArgs([
             'POST',
-            'https://api.example/api/enquiry/domTransaction',
+            'https://api.example/api/transaction/zenithTransfer',
             [
 
                 \GuzzleHttp\RequestOptions::HEADERS => [
@@ -60,7 +63,12 @@ class FetchDomesticTransactionTest extends TestCase
                     'Authorization' => "Bearer {$this->authToken}",
                 ],
                 \GuzzleHttp\RequestOptions::JSON => [
-                    'transactionReference' => $this->transactionReference,
+                    'amount' => 100.01,
+                    'bankName' => 'zenith',
+                    'crAccount' => '556890',
+                    'drAccount' => '448000',
+                    'transactionReference' => 'REF-1234',
+                    'description' => 'REF-1234',
                 ],
             ],
         ])->once()->andReturn($mockedResponse);
@@ -76,9 +84,9 @@ class FetchDomesticTransactionTest extends TestCase
          * */
         $api = new Client($mockedConfig, $mockedClient, $mockedCache);
 
-        $requestResult = $api->fetchDomesticTransaction($this->transactionReference);
+        $requestResult = $api->sendTransaction($transaction);
 
-        $this->assertInstanceOf(FetchDomesticTransactionResponse::class, $requestResult);
+        $this->assertInstanceOf(SendTransactionResponse::class, $requestResult);
         $this->assertFalse($requestResult->paid());
     }
 }

@@ -92,5 +92,6 @@ class SendDomesticTransactionTest extends TestCase
         $requestResult = $api->sendDomesticTransaction($transaction);
 
         $this->assertInstanceOf(SendTransactionResponse::class, $requestResult);
+        $this->assertFalse($requestResult->paid());
     }
 }
