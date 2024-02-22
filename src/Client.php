@@ -12,14 +12,12 @@ use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\ClientInterface;
 use Carbon\Carbon;
-use BrokeYourBike\ZenithBank\Models\TransactionLookupResponse;
-use BrokeYourBike\ZenithBank\Models\SendDomesticTransactionResponse;
+use BrokeYourBike\ZenithBank\Models\SendTransactionResponse;
 use BrokeYourBike\ZenithBank\Models\FetchTransactionResponse;
 use BrokeYourBike\ZenithBank\Models\FetchDomesticTransactionResponse;
 use BrokeYourBike\ZenithBank\Models\FetchDomesticAccountResponse;
 use BrokeYourBike\ZenithBank\Models\FetchBalanceResponse;
 use BrokeYourBike\ZenithBank\Models\FetchAuthTokenResponse;
-use BrokeYourBike\ZenithBank\Models\FetchAccountResponse;
 use BrokeYourBike\ZenithBank\Interfaces\TransactionInterface;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ResolveUri\ResolveUriTrait;
@@ -87,6 +85,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         return $response->token;
     }
 
+    // GetToken
     public function fetchAuthTokenRaw(): FetchAuthTokenResponse
     {
         $options = [
@@ -110,6 +109,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         return new FetchAuthTokenResponse($response);
     }
 
+    // Account Balance Enquiry
     public function fetchBalanceRaw(string $accountNumber): FetchBalanceResponse
     {
         $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/balance', [
@@ -119,16 +119,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         return new FetchBalanceResponse($response);
     }
 
-    public function fetchAccountRaw(string $bankCode, string $accountNumber): FetchAccountResponse
-    {
-        $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/accountEnquiry', [
-            'destinationBankCode' => $bankCode,
-            'accountNumber' => $accountNumber,
-        ]);
-
-        return new FetchAccountResponse($response);
-    }
-
+    // DOM Account Enquiry
     public function fetchDomesticAccountRaw(string $accountNumber): FetchDomesticAccountResponse
     {
         $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domAccountEnquiry', [
@@ -138,6 +129,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         return new FetchDomesticAccountResponse($response);
     }
 
+    // Transaction Enquiry (DOM)
     public function fetchDomesticTransactionRaw(string $reference): FetchDomesticTransactionResponse
     {
         $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domTransaction', [
@@ -147,7 +139,8 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         return new FetchDomesticTransactionResponse($response);
     }
 
-    public function sendDomesticTransaction(TransactionInterface $transaction): SendDomesticTransactionResponse
+    // Transfer To Zenith (DOM)
+    public function sendDomesticTransaction(TransactionInterface $transaction): SendTransactionResponse
     {
         if ($transaction instanceof SourceModelInterface) {
             $this->setSourceModel($transaction);
@@ -164,9 +157,10 @@ class Client implements HttpClientInterface, HasSourceModelInterface
             'resend' => $transaction->shouldResend(),
         ]);
 
-        return new SendDomesticTransactionResponse($response);
+        return new SendTransactionResponse($response);
     }
 
+    // Transaction Enquiry (NGN)
     public function fetchTransactionRaw(string $reference): FetchTransactionResponse
     {
         $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transaction', [
@@ -176,14 +170,43 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         return new FetchTransactionResponse($response);
     }
 
-    public function transactionLookupRaw(string $accountNumber, \DateTime $transactionDate): TransactionLookupResponse
+    // Transfer To Zenith (NGN)
+    public function sendTransaction(TransactionInterface $transaction): SendTransactionResponse
     {
-        $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transactionLookup', [
-            'accountNumber' => $accountNumber,
-            'transactionDate' => $transactionDate->format('Y-m-d'),
+        if ($transaction instanceof SourceModelInterface) {
+            $this->setSourceModel($transaction);
+        }
+
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/transaction/zenithTransfer', [
+            'amount' => $transaction->getAmount(),
+            'bankName' => 'zenith',
+            'crAccount' => $transaction->getRecipientAccount(),
+            'drAccount' => $transaction->getDebitAccount(),
+            'transactionReference' => $transaction->getReference(),
+            'description' => $transaction->getReference(),
         ]);
 
-        return new TransactionLookupResponse($response);
+        return new SendTransactionResponse($response);
+    }
+
+    // Transfer to Other Bank (NGN)
+    public function sendOtherBankTransaction(TransactionInterface $transaction): SendTransactionResponse
+    {
+        if ($transaction instanceof SourceModelInterface) {
+            $this->setSourceModel($transaction);
+        }
+
+        $response = $this->performRequest(HttpMethodEnum::POST, 'api/transaction/otherBankTransfer', [
+            'amount' => $transaction->getAmount(),
+            'bankCode' => $transaction->getRecipientBankCode(),
+            'bankName' => 'zenith',
+            'crAccount' => $transaction->getRecipientAccount(),
+            'drAccount' => $transaction->getDebitAccount(),
+            'transactionReference' => $transaction->getReference(),
+            'description' => $transaction->getReference(),
+        ]);
+
+        return new SendTransactionResponse($response);
     }
 
     /**

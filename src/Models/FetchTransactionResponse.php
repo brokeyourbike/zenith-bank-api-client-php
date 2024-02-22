@@ -8,6 +8,10 @@
 
 namespace BrokeYourBike\ZenithBank\Models;
 
+use Spatie\DataTransferObject\Attributes\MapFrom;
+use BrokeYourBike\ZenithBank\Enums\StatusCodeEnum;
+use BrokeYourBike\ZenithBank\Enums\PostedStatusEnum;
+use BrokeYourBike\ZenithBank\Enums\ErrorCodeEnum;
 use BrokeYourBike\DataTransferObject\JsonResponse;
 
 /**
@@ -18,4 +22,17 @@ class FetchTransactionResponse extends JsonResponse
     public string $responseCode;
     public string $responseDescription;
     public ?string $description;
+
+    #[MapFrom('transactionDetails.posted')]
+    public ?string $posted;
+
+    #[MapFrom('transactionDetails.transactionStatus')]
+    public ?string $transactionStatus;
+
+    public function paid(): bool
+    {
+        return $this->responseCode === ErrorCodeEnum::SUCCESS->value 
+            && $this->posted === PostedStatusEnum::YES->value
+            && $this->transactionStatus === StatusCodeEnum::PROCESSED->value;
+    }
 }

@@ -10,7 +10,7 @@ namespace BrokeYourBike\ZenithBank\Tests;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
-use BrokeYourBike\ZenithBank\Models\SendDomesticTransactionResponse;
+use BrokeYourBike\ZenithBank\Models\SendTransactionResponse;
 use BrokeYourBike\ZenithBank\Interfaces\TransactionInterface;
 use BrokeYourBike\ZenithBank\Interfaces\ConfigInterface;
 use BrokeYourBike\ZenithBank\Client;
@@ -91,6 +91,6 @@ class SendDomesticTransactionTest extends TestCase
 
         $requestResult = $api->sendDomesticTransaction($transaction);
 
-        $this->assertInstanceOf(SendDomesticTransactionResponse::class, $requestResult);
+        $this->assertInstanceOf(SendTransactionResponse::class, $requestResult);
     }
 }

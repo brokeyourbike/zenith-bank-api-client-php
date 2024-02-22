@@ -8,12 +8,15 @@
 
 namespace BrokeYourBike\ZenithBank\Models;
 
+use BrokeYourBike\ZenithBank\Enums\StatusCodeEnum;
+use BrokeYourBike\ZenithBank\Enums\PostedStatusEnum;
+use BrokeYourBike\ZenithBank\Enums\ErrorCodeEnum;
 use BrokeYourBike\DataTransferObject\JsonResponse;
 
 /**
  * @author Ivan Stasiuk <ivan@stasi.uk>
  */
-class SendDomesticTransactionResponse extends JsonResponse
+class SendTransactionResponse extends JsonResponse
 {
     public string $responseCode;
     public string $responseDescription;
@@ -23,4 +26,11 @@ class SendDomesticTransactionResponse extends JsonResponse
     public ?string $transactionStatus;
     public ?string $postingDate;
     public ?string $postingReference;
+
+    public function paid(): bool
+    {
+        return $this->responseCode === ErrorCodeEnum::SUCCESS->value 
+            && $this->posted === PostedStatusEnum::YES->value
+            && $this->transactionStatus === StatusCodeEnum::PROCESSED->value;
+    }
 }
