@@ -17,7 +17,7 @@ use BrokeYourBike\ZenithBank\Client;
 /**
  * @author Ivan Stasiuk <ivan@stasi.uk>
  */
-class FetchDomesticAccountRawTest extends TestCase
+class FetchDomesticAccountTest extends TestCase
 {
     private string $authToken = 'secure-token';
     private string $accountNumber = '654987';
@@ -69,7 +69,7 @@ class FetchDomesticAccountRawTest extends TestCase
          * */
         $api = new Client($mockedConfig, $mockedClient, $mockedCache);
 
-        $requestResult = $api->fetchDomesticAccountRaw($this->accountNumber);
+        $requestResult = $api->fetchDomesticAccount($this->accountNumber);
 
         $this->assertInstanceOf(FetchDomesticAccountResponse::class, $requestResult);
     }

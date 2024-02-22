@@ -17,7 +17,7 @@ use BrokeYourBike\ZenithBank\Client;
 /**
  * @author Ivan Stasiuk <ivan@stasi.uk>
  */
-class FetchDomesticTransactionRawTest extends TestCase
+class FetchDomesticTransactionTest extends TestCase
 {
     private string $authToken = 'secure-token';
     private string $transactionReference = 'TRX-1234';
@@ -76,7 +76,7 @@ class FetchDomesticTransactionRawTest extends TestCase
          * */
         $api = new Client($mockedConfig, $mockedClient, $mockedCache);
 
-        $requestResult = $api->fetchDomesticTransactionRaw($this->transactionReference);
+        $requestResult = $api->fetchDomesticTransaction($this->transactionReference);
 
         $this->assertInstanceOf(FetchDomesticTransactionResponse::class, $requestResult);
     }

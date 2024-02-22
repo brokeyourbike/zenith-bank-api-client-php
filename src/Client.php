@@ -72,7 +72,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
             }
         }
 
-        $response = $this->fetchAuthTokenRaw();
+        $response = $this->fetchAuthToken();
 
         $expiresAt = Carbon::parse($response->expiration);
 
@@ -86,7 +86,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
     }
 
     // GetToken
-    public function fetchAuthTokenRaw(): FetchAuthTokenResponse
+    public function fetchAuthToken(): FetchAuthTokenResponse
     {
         $options = [
             \GuzzleHttp\RequestOptions::HEADERS => [
@@ -110,7 +110,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
     }
 
     // Account Balance Enquiry
-    public function fetchBalanceRaw(string $accountNumber): FetchBalanceResponse
+    public function fetchBalance(string $accountNumber): FetchBalanceResponse
     {
         $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/balance', [
             'accountNumber' => $accountNumber,
@@ -120,7 +120,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
     }
 
     // DOM Account Enquiry
-    public function fetchDomesticAccountRaw(string $accountNumber): FetchDomesticAccountResponse
+    public function fetchDomesticAccount(string $accountNumber): FetchDomesticAccountResponse
     {
         $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domAccountEnquiry', [
             'accountNumber' => $accountNumber,
@@ -130,7 +130,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
     }
 
     // Transaction Enquiry (DOM)
-    public function fetchDomesticTransactionRaw(string $reference): FetchDomesticTransactionResponse
+    public function fetchDomesticTransaction(string $reference): FetchDomesticTransactionResponse
     {
         $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/domTransaction', [
             'transactionReference' => $reference,
@@ -161,7 +161,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
     }
 
     // Transaction Enquiry (NGN)
-    public function fetchTransactionRaw(string $reference): FetchTransactionResponse
+    public function fetchTransaction(string $reference): FetchTransactionResponse
     {
         $response = $this->performRequest(HttpMethodEnum::POST, 'api/enquiry/transaction', [
             'transactionReference' => $reference,

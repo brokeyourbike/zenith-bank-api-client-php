@@ -17,7 +17,7 @@ use BrokeYourBike\ZenithBank\Client;
 /**
  * @author Ivan Stasiuk <ivan@stasi.uk>
  */
-class FetchAuthTokenRawTest extends TestCase
+class FetchAuthTokenTest extends TestCase
 {
     private string $username = 'unique-username';
     private string $password = 'secure-password';
@@ -67,7 +67,7 @@ class FetchAuthTokenRawTest extends TestCase
          * @var CacheInterface $mockedCache
          * */
         $api = new Client($mockedConfig, $mockedClient, $mockedCache);
-        $requestResult = $api->fetchAuthTokenRaw();
+        $requestResult = $api->fetchAuthToken();
 
         $this->assertInstanceOf(FetchAuthTokenResponse::class, $requestResult);
     }
