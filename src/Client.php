@@ -41,7 +41,6 @@ class Client implements HttpClientInterface, HasSourceModelInterface
 
     private ConfigInterface $config;
     private CacheInterface $cache;
-    private int $ttlMarginInSeconds = 60;
 
     public function __construct(ConfigInterface $config, ClientInterface $httpClient, CacheInterface $cache)
     {
@@ -82,7 +81,7 @@ class Client implements HttpClientInterface, HasSourceModelInterface
         $this->cache->set(
             $this->authTokenCacheKey(),
             $response->token,
-            $expiresAt->subSeconds($this->ttlMarginInSeconds)->diffInSeconds(Carbon::now())
+            $expiresAt->diffInSeconds(Carbon::now()) / 2
         );
 
         return $response->token;
