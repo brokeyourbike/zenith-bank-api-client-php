@@ -1,5 +1,17 @@
 # Changelog
 
+### [0.3.3](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.3.2...v0.3.3) (2024-02-22)
+
+
+### Bug Fixes
+
+* less cache ([ceefd20](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/ceefd20ed94e307f90e99883054edcd45a98c7c3))
+
+
+### Miscellaneous Chores
+
+* button ([dcf794c](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/commit/dcf794c50b6e67be02f21576dd3f2a70b76f0096))
+
 ### [0.3.2](https://www.github.com/brokeyourbike/zenith-bank-api-client-php/compare/v0.3.1...v0.3.2) (2023-05-14)
 
 
