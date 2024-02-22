@@ -13,8 +13,8 @@ namespace BrokeYourBike\ZenithBank\Enums;
  */
 enum StatusCodeEnum: string
 {
-    /**
-     * Transaction processed.
-     */
+    case PROCESSING = 'PROCESSING';
     case PROCESSED = 'PROCESSED';
+    case PENDING = 'PENDING';
+    case UNKNOWN = 'UNKNOWN';
 }
