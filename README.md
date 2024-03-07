@@ -24,7 +24,7 @@ assert($httpClient instanceof \GuzzleHttp\ClientInterface);
 assert($psrCache instanceof \Psr\SimpleCache\CacheInterface);
 
 $apiClient = new Client($config, $httpClient, $psrCache);
-$apiClient->fetchAuthTokenRaw();
+$apiClient->fetchAuthToken();
 ```
 
 ## Authors
